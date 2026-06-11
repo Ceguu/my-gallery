@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CE小站 · 图文分享</title>
+    <style>
+        /* ---------- 所有样式与之前完全一致（白底黑字简约风） ---------- */
+        :root {
+            --bg: #ffffff;
+            --bg-secondary: #f8f8fa;
+            --card-bg: #ffffff;
+            --text-primary: #111111;
+            --text-secondary: #7a7a82;
+            --text-muted: #b0b0b8;
+            --theme: #000000;
+            --theme-hover: #222222;
+            --border: #eaeaf0;
+            --shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
+            --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.10);
+            --radius: 14px;
+            --radius-sm: 8px;
+            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --max-width: 1120px;
+            --header-h: 60px;
+            --transition: 0.25s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg);
+            color: var(--text-primary);
+            font-family: var(--font);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        a { color: var(--theme); text-decoration: none; }
+        a:hover { color: var(--theme-hover); }
+        img { max-width: 100%; display: block; }
+
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        .container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
+
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            padding: 8px 22px; border-radius: 40px; font-weight: 500; font-size: 14px;
+            border: none; cursor: pointer; transition: all var(--transition);
+            background: var(--bg-secondary); color: var(--text-primary);
+            border: 1px solid var(--border); line-height: 1.4;
+        }
+        .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+        .btn-primary { background: var(--theme); color: #fff; border-color: var(--theme); }
+        .btn-primary:hover { background: var(--theme-hover); border-color: var(--theme-hover); box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
+        .btn-danger { background: #ffffff; color: #e74c3c; border-color: #f0d0d0; }
+        .btn-danger:hover { background: #fee8e8; border-color: #e74c3c; }
+        .btn-sm { padding: 4px 14px; font-size: 12px; }
+        .btn-outline { background: transparent; border-color: var(--border); }
+        .btn-outline:hover { border-color: var(--text-primary); }
+        .hidden { display: none !important; }
+
+        /* ---- 导航 ---- */
+        .header {
+            height: var(--header-h); border-bottom: 1px solid var(--border);
+            background: rgba(255,255,255,0.92); backdrop-filter: blur(10px);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .header-inner {
+            display: flex; align-items: center; justify-content: space-between;
+            height: 100%;
+        }
+        .header .logo {
+            font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
+            display: flex; align-items: center; gap: 8px; color: var(--text-primary);
+        }
+        .header .logo .logo-icon {
+            display: inline-block; width: 28px; height: 28px;
+            background: var(--theme); color: #fff; border-radius: var(--radius-sm);
+            text-align: center; line-height: 28px; font-size: 15px; font-weight: 600;
+        }
+        .header .nav-actions { display: flex; align-items: center; gap: 10px; }
+        .header .nav-actions .nav-btn {
+            font-size: 13px; padding: 6px 16px; border-radius: 30px;
+            background: transparent; border: 1px solid var(--border); cursor: pointer;
+            transition: all var(--transition); color: var(--text-secondary);
+        }
+        .header .nav-actions .nav-btn:hover { border-color: var(--text-primary); color: var(--text-primary); }
+        .header .nav-actions .nav-btn.active { background: var(--theme); color: #fff; border-color: var(--theme); }
+
+        /* ---- 浏览视图 ---- */
+        .view-home { padding: 40px 0 80px; }
+        .view-home .page-title { font-size: 26px; font-weight: 700; letter-spacing: -0.4px; margin-bottom: 4px; }
+        .view-home .page-subtitle { color: var(--text-secondary); font-size: 15px; margin-bottom: 36px; }
+
+        .empty-state { text-align: center; padding: 100px 20px; color: var(--text-muted); }
+        .empty-state .empty-icon { font-size: 56px; margin-bottom: 16px; opacity: 0.5; }
+        .empty-state h3 { font-size: 18px; color: var(--text-secondary); margin-bottom: 6px; }
+        .empty-state p { color: var(--text-muted); font-size: 14px; margin-bottom: 20px; }
+
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 28px; }
+        .card {
+            background: var(--card-bg); border-radius: var(--radius); overflow: hidden;
+            box-shadow: var(--shadow); transition: transform 0.3s ease, box-shadow 0.4s ease;
+            cursor: pointer; border: 1px solid var(--border);
+        }
+        .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+        .card-img-wrap { position: relative; width: 100%; padding-top: 62%; background: var(--bg-secondary); overflow: hidden; }
+        .card-img-wrap img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; pointer-events: none; }
+        .card:hover .card-img-wrap img { transform: scale(1.04); }
+        .card-img-wrap .img-placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 36px; background: var(--bg-secondary); }
+        .card-body { padding: 18px 20px 20px; pointer-events: none; }
+        .card-body .card-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; color: var(--text-primary); }
+        .card-body .card-content { color: var(--text-secondary); font-size: 14px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 10px; line-height: 1.5; }
+        .card-body .card-meta { display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--text-muted); }
+        .card-body .card-meta .category { background: var(--bg-secondary); padding: 2px 12px; border-radius: 20px; font-size: 11px; color: var(--text-secondary); border: 1px solid var(--border); }
+
+        /* ---- 管理视图 ---- */
+        .view-admin { padding: 32px 0 80px; }
+        .admin-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; }
+        .admin-header h2 { font-size: 20px; font-weight: 600; }
+        .admin-header .admin-hint { color: var(--text-muted); font-size: 13px; }
+        .admin-toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+
+        .admin-list { display: flex; flex-direction: column; gap: 10px; }
+        .admin-item { background: var(--bg-secondary); border-radius: var(--radius-sm); padding: 14px 18px; display: flex; align-items: center; gap: 16px; border: 1px solid var(--border); transition: background 0.2s; }
+        .admin-item:hover { background: #f0f0f4; }
+        .admin-item .item-index { color: var(--text-muted); font-size: 12px; width: 24px; flex-shrink: 0; text-align: center; font-weight: 500; }
+        .admin-item .item-thumb { width: 52px; height: 52px; border-radius: var(--radius-sm); object-fit: cover; background: var(--bg); flex-shrink: 0; border: 1px solid var(--border); }
+        .admin-item .item-thumb-placeholder { width: 52px; height: 52px; border-radius: var(--radius-sm); background: var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 18px; }
+        .admin-item .item-info { flex: 1; min-width: 0; }
+        .admin-item .item-info .item-title { font-weight: 500; font-size: 14px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .admin-item .item-info .item-desc { color: var(--text-secondary); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+        .admin-item .item-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+        /* ---- 模态框 (通用) ---- */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.35); backdrop-filter: blur(4px);
+            z-index: 200; display: flex; align-items: center; justify-content: center;
+            padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal {
+            background: #ffffff; border-radius: 18px; width: 100%; max-width: 520px;
+            max-height: 90vh; overflow-y: auto; padding: 28px 30px 32px;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.20); transform: scale(0.96) translateY(10px);
+            transition: transform 0.3s ease; border: 1px solid var(--border);
+        }
+        .modal-overlay.active .modal { transform: scale(1) translateY(0); }
+        .modal .modal-title { font-size: 18px; font-weight: 600; margin-bottom: 22px; display: flex; align-items: center; justify-content: space-between; color: var(--text-primary); }
+        .modal .modal-title .close-btn { background: none; border: none; color: var(--text-muted); font-size: 22px; cursor: pointer; padding: 0 4px; transition: color 0.2s; line-height: 1; }
+        .modal .modal-title .close-btn:hover { color: var(--text-primary); }
+
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 5px; }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%; padding: 10px 14px; border-radius: var(--radius-sm);
+            border: 1px solid var(--border); background: var(--bg); color: var(--text-primary);
+            font-size: 14px; font-family: inherit; transition: border 0.2s, box-shadow 0.2s; outline: none;
+        }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            border-color: var(--theme); box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
+        }
+        .form-group textarea { min-height: 80px; resize: vertical; }
+        .form-group .hint { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+        .form-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--border); }
+
+        /* ---- 大图详情模态框特有样式 ---- */
+        .detail-image-wrapper {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .detail-image-wrapper img {
+            max-width: 100%;
+            max-height: 70vh;
+            border-radius: 12px;
+            object-fit: contain;
+            background: var(--bg-secondary);
+        }
+        .detail-info {
+            padding: 0 10px;
+        }
+        .detail-info h3 { margin-bottom: 8px; }
+        .detail-info p { color: var(--text-secondary); line-height: 1.6; }
+        .detail-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        /* ---- 底部保存栏 ---- */
+        .admin-save-bar {
+            position: sticky; bottom: 0; background: rgba(255,255,255,0.94);
+            backdrop-filter: blur(12px); border-top: 1px solid var(--border);
+            padding: 14px 0; margin-top: 32px; z-index: 50;
+        }
+        .admin-save-bar .save-bar-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+        .admin-save-bar .save-status { font-size: 13px; color: var(--text-secondary); }
+        .admin-save-bar .save-status.success { color: #2e7d32; }
+        .admin-save-bar .save-status.error { color: #c62828; }
+        .admin-save-bar .save-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        /* ---- Toast ---- */
+        .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 300; display: flex; flex-direction: column; gap: 8px; max-width: 360px; }
+        .toast {
+            background: #ffffff; border: 1px solid var(--border); border-radius: 12px;
+            padding: 12px 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+            animation: toastIn 0.35s ease; font-size: 14px; display: flex; align-items: center;
+            gap: 10px; color: var(--text-primary);
+        }
+        .toast.success { border-left: 4px solid #2e7d32; }
+        .toast.error { border-left: 4px solid #c62828; }
+        .toast.info { border-left: 4px solid var(--theme); }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 16px; }
+            .card-grid { grid-template-columns: 1fr; gap: 20px; }
+            .admin-item { flex-wrap: wrap; padding: 12px 14px; }
+            .admin-item .item-actions { width: 100%; justify-content: flex-end; margin-top: 4px; }
+            .admin-save-bar .save-bar-inner { flex-direction: column; align-items: stretch; text-align: center; }
+            .admin-save-bar .save-actions { justify-content: center; }
+            .modal { padding: 20px; }
+            .header .logo { font-size: 16px; }
+            .view-home { padding: 24px 0 60px; }
+            .config-panel .config-row { flex-direction: column; }
+            .toast-container { left: 16px; right: 16px; bottom: 16px; }
+            .admin-toolbar { flex-direction: column; align-items: stretch; }
+            .admin-toolbar .btn { justify-content: center; }
+        }
+        @media (max-width: 480px) {
+            .card-grid { gap: 16px; }
+            .card-body { padding: 14px 16px 16px; }
+            .admin-item .item-thumb, .admin-item .item-thumb-placeholder { width: 42px; height: 42px; }
+            .admin-item .item-info .item-title { font-size: 13px; }
+            .header .nav-actions .nav-btn { font-size: 12px; padding: 4px 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <div class="container header-inner">
+        <div class="logo">
+            <span class="logo-icon">◇</span>
+            <span>CE小站</span>
+        </div>
+        <div class="nav-actions">
+            <button class="nav-btn active" id="navHome">浏览</button>
+            <button class="nav-btn" id="navAdmin">管理</button>
+        </div>
+    </div>
+</header>
+
+<main>
+    <!-- 浏览视图 -->
+    <section class="view-home" id="viewHome">
+        <div class="container">
+            <h1 class="page-title">影像记录</h1>
+            <p class="page-subtitle" id="homeSubtitle">加载中...</p>
+            <div class="card-grid" id="cardGrid"></div>
+            <div class="empty-state hidden" id="emptyState">
+                <div class="empty-icon">📭</div>
+                <h3>还没有内容</h3>
+                <p>点击右上角「管理」添加第一条记录</p>
+                <button class="btn btn-primary" id="goAdminBtn">去管理 →</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 管理视图 -->
+    <section class="view-admin hidden" id="viewAdmin">
+        <div class="container">
+            <div class="admin-header">
+                <div>
+                    <h2>内容管理</h2>
+                    <span class="admin-hint" id="adminCount">共 0 项</span>
+                </div>
+            </div>
+
+            <div class="config-panel" id="configPanel">
+                <div class="config-title" id="configToggle">
+                    <span class="chevron" id="configChevron">▶</span> GitHub 同步设置（可选）
+                </div>
+                <div class="config-body" id="configBody">
+                    <div class="config-row">
+                        <div class="form-group">
+                            <label>Token</label>
+                            <input type="text" id="cfgToken" placeholder="ghp_xxxxxxxx" />
+                        </div>
+                        <div class="form-group">
+                            <label>仓库</label>
+                            <input type="text" id="cfgRepo" placeholder="user/repo" />
+                        </div>
+                    </div>
+                    <div class="config-row">
+                        <div class="form-group">
+                            <label>文件路径</label>
+                            <input type="text" id="cfgPath" value="data/data.json" />
+                        </div>
+                        <div class="form-group">
+                            <label>分支</label>
+                            <input type="text" id="cfgBranch" value="main" />
+                        </div>
+                        <button class="btn btn-sm" id="cfgSaveBtn">保存配置</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-toolbar">
+                <button class="btn btn-primary" id="addItemBtn">＋ 新增</button>
+                <button class="btn btn-outline" id="exportBtn">📥 导出 JSON</button>
+                <button class="btn btn-outline" id="importBtn">📤 导入 JSON</button>
+                <input type="file" id="importFileInput" accept=".json" style="display:none" />
+            </div>
+
+            <div class="admin-list" id="adminList"></div>
+
+            <div class="admin-save-bar">
+                <div class="container save-bar-inner">
+                    <span class="save-status" id="saveStatus">💾 数据存储在本地浏览器</span>
+                    <div class="save-actions">
+                        <button class="btn btn-sm btn-primary" id="saveToGitHubBtn">保存到 GitHub</button>
+                        <button class="btn btn-sm btn-outline" id="resetLocalBtn">重置本地数据</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- 新增/编辑内容的模态框 -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <div class="modal-title">
+            <span id="modalTitle">添加内容</span>
+            <button class="close-btn" id="modalCloseBtn">✕</button>
+        </div>
+        <form id="itemForm" autocomplete="off">
+            <input type="hidden" id="formId" />
+            <div class="form-group">
+                <label for="formTitle">标题 *</label>
+                <input type="text" id="formTitle" placeholder="输入标题" required />
+            </div>
+            <div class="form-group">
+                <label for="formContent">描述</label>
+                <textarea id="formContent" placeholder="写一段描述文字..." rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="formImage">图片链接</label>
+                <input type="url" id="formImage" placeholder="https://example.com/image.jpg" />
+                <div class="hint">支持外链图片，建议使用稳定的图床</div>
+            </div>
+            <div class="form-group">
+                <label for="formCategory">分类</label>
+                <select id="formCategory">
+                    <option value="日常">日常</option>
+                    <option value="旅行">旅行</option>
+                    <option value="美食">美食</option>
+                    <option value="设计">设计</option>
+                    <option value="其他">其他</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="formDate">日期</label>
+                <input type="date" id="formDate" />
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-outline" id="formCancelBtn">取消</button>
+                <button type="submit" class="btn btn-primary" id="formSubmitBtn">保存</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 大图详情模态框（新增） -->
+<div class="modal-overlay" id="detailOverlay">
+    <div class="modal" style="max-width: 700px;">
+        <div class="modal-title">
+            <span id="detailTitle">图片详情</span>
+            <button class="close-btn" id="detailCloseBtn">✕</button>
+        </div>
+        <div class="detail-image-wrapper">
+            <img id="detailImage" src="" alt="大图预览" />
+        </div>
+        <div class="detail-info">
+            <h3 id="detailCardTitle"></h3>
+            <p id="detailContent"></p>
+            <div class="detail-meta">
+                <span id="detailCategory"></span>
+                <span id="detailDate"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+(function() {
+    'use strict';
+
+    // 工具
+    const $ = (sel, ctx = document) => ctx.querySelector(sel);
+    const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
+
+    function uuid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+    function formatDate(d) {
+        if (!d) return '';
+        const dt = new Date(d);
+        if (isNaN(dt)) return d;
+        return dt.toLocaleDateString('zh-CN', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+    function todayStr() { return new Date().toISOString().slice(0, 10); }
+    function toast(msg, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        const el = document.createElement('div');
+        el.className = `toast ${type}`;
+        el.textContent = msg;
+        container.appendChild(el);
+        setTimeout(() => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(12px)';
+            el.style.transition = 'all 0.3s ease';
+            setTimeout(() => el.remove(), 300);
+        }, 3200);
+    }
+
+    // 数据存储
+    const STORAGE_KEY = 'jinying_data';
+    const CONFIG_KEY = 'jinying_config';
+
+    function getLocalData() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            return raw ? JSON.parse(raw) : [];
+        } catch { return []; }
+    }
+    function setLocalData(data) { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+
+    function getConfig() {
+        try {
+            const raw = localStorage.getItem(CONFIG_KEY);
+            return raw ? JSON.parse(raw) : { token: '', repo: '', path: 'data/data.json', branch: 'main' };
+        } catch { return { token: '', repo: '', path: 'data/data.json', branch: 'main' }; }
+    }
+    function saveConfig(cfg) { localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg)); }
+
+    // GitHub 操作
+    async function fetchGitHubData(cfg) {
+        if (!cfg.token || !cfg.repo) return null;
+        const url = `https://api.github.com/repos/${cfg.repo}/contents/${cfg.path}?ref=${cfg.branch || 'main'}`;
+        const resp = await fetch(url, {
+            headers: { 'Authorization': `token ${cfg.token}`, 'Accept': 'application/vnd.github.v3+json' }
+        });
+        if (!resp.ok) { if (resp.status === 404) return null; throw new Error(`GitHub 错误 ${resp.status}`); }
+        const body = await resp.json();
+        const content = decodeURIComponent(escape(atob(body.content)));
+        return { data: JSON.parse(content), sha: body.sha };
+    }
+
+    async function pushGitHubData(cfg, data, sha) {
+        if (!cfg.token || !cfg.repo) throw new Error('请先配置 GitHub Token 和仓库');
+        const url = `https://api.github.com/repos/${cfg.repo}/contents/${cfg.path}?ref=${cfg.branch || 'main'}`;
+        const jsonStr = JSON.stringify(data, null, 2);
+        const encoded = btoa(unescape(encodeURIComponent(jsonStr)));
+        const resp = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${cfg.token}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                message: '📝 更新内容数据',
+                content: encoded,
+                sha: sha || undefined,
+                branch: cfg.branch || 'main',
+            })
+        });
+        if (!resp.ok) { const err = await resp.json().catch(() => ({})); throw new Error(err.message || `GitHub 错误: ${resp.status}`); }
+        const result = await resp.json();
+        return result.content.sha;
+    }
+
+    // 全局变量
+    let data = [];
+    let editingId = null;
+
+    // ==================== 新增：大图详情相关函数 ====================
+    function openDetail(item) {
+        const img = document.getElementById('detailImage');
+        img.src = item.image || '';
+        img.alt = item.title || '图片';
+        // 如果图片加载失败，显示占位符
+        img.onerror = function() { this.src = ''; this.alt = '图片加载失败'; };
+        document.getElementById('detailCardTitle').textContent = item.title || '无标题';
+        document.getElementById('detailContent').textContent = item.content || '暂无描述';
+        document.getElementById('detailCategory').textContent = item.category || '未分类';
+        document.getElementById('detailDate').textContent = formatDate(item.date);
+        document.getElementById('detailOverlay').classList.add('active');
+    }
+
+    function closeDetail() {
+        document.getElementById('detailOverlay').classList.remove('active');
+    }
+    // ==================== 新增部分结束 ====================
+
+    // 渲染函数
+    function renderHome() {
+        const grid = document.getElementById('cardGrid');
+        const empty = document.getElementById('emptyState');
+        const subtitle = document.getElementById('homeSubtitle');
+        const items = data || [];
+
+        if (!items.length) {
+            grid.innerHTML = '';
+            empty.classList.remove('hidden');
+            subtitle.textContent = '还没有内容，去管理页面添加吧';
+            return;
+        }
+        empty.classList.add('hidden');
+        subtitle.textContent = `共 ${items.length} 篇记录`;
+
+        // 为每张卡片绑定 data-id，点击时通过事件委托打开详情
+        grid.innerHTML = items.map(item => {
+            const imgHtml = item.image ?
+                `<img src="${item.image}" alt="${item.title || ''}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'img-placeholder\\'>📷</div>'" />` :
+                `<div class="img-placeholder">📷</div>`;
+            const dateStr = formatDate(item.date);
+            const cat = item.category || '未分类';
+            const desc = item.content || '';
+            return `<div class="card" data-id="${item.id}">
+                <div class="card-img-wrap">${imgHtml}</div>
+                <div class="card-body">
+                    <div class="card-title">${item.title || '无标题'}</div>
+                    ${desc ? `<div class="card-content">${desc}</div>` : ''}
+                    <div class="card-meta">
+                        <span class="category">${cat}</span>
+                        <span>${dateStr}</span>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+
+        // 事件委托：点击卡片打开大图详情
+        grid.addEventListener('click', function(e) {
+            const card = e.target.closest('.card');
+            if (!card) return;
+            const id = card.dataset.id;
+            const item = data.find(d => d.id === id);
+            if (item) openDetail(item);
+        });
+    }
+
+    function renderAdmin() {
+        const list = document.getElementById('adminList');
+        const count = document.getElementById('adminCount');
+        const items = data || [];
+        count.textContent = `共 ${items.length} 项`;
+        if (!items.length) {
+            list.innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--text-muted);font-size:14px;">暂无内容，点击「新增」添加</div>`;
+            return;
+        }
+        list.innerHTML = items.map((item, idx) => {
+            const thumbHtml = item.image ?
+                `<img class="item-thumb" src="${item.image}" alt="" onerror="this.outerHTML='<div class=\\'item-thumb-placeholder\\'>📷</div>'" />` :
+                `<div class="item-thumb-placeholder">📷</div>`;
+            const desc = item.content || '无描述';
+            return `<div class="admin-item">
+                <span class="item-index">${idx + 1}</span>
+                ${thumbHtml}
+                <div class="item-info">
+                    <div class="item-title">${item.title || '无标题'}</div>
+                    <div class="item-desc">${desc}</div>
+                </div>
+                <div class="item-actions">
+                    <button class="btn btn-sm btn-outline edit-btn" data-id="${item.id}">编辑</button>
+                    <button class="btn btn-sm btn-danger delete-btn" data-id="${item.id}">删除</button>
+                </div>
+            </div>`;
+        }).join('');
+        // 管理列表事件委托（编辑/删除）
+        list.addEventListener('click', function(e) {
+            const target = e.target.closest('button');
+            if (!target) return;
+            const id = target.dataset.id;
+            if (target.classList.contains('edit-btn')) {
+                const item = data.find(d => d.id === id);
+                if (item) openModal(item);
+            } else if (target.classList.contains('delete-btn')) {
+                if (confirm('确定要删除这项吗？')) {
+                    data = data.filter(d => d.id !== id);
+                    saveAndRefresh('已删除');
+                }
+            }
+        });
+    }
+
+    function refreshAll() {
+        renderHome();
+        renderAdmin();
+        const status = document.getElementById('saveStatus');
+        status.textContent = '💾 数据已保存至本地浏览器';
+        status.className = 'save-status';
+    }
+
+    function saveAndRefresh(msg = '已保存') {
+        setLocalData(data);
+        refreshAll();
+        if (msg) toast(msg, 'success');
+    }
+
+    // 模态框（新增/编辑）
+    function openModal(item = null) {
+        const overlay = document.getElementById('modalOverlay');
+        const titleEl = document.getElementById('modalTitle');
+        const idInput = document.getElementById('formId');
+        const titleInput = document.getElementById('formTitle');
+        const contentInput = document.getElementById('formContent');
+        const imageInput = document.getElementById('formImage');
+        const categorySelect = document.getElementById('formCategory');
+        const dateInput = document.getElementById('formDate');
+        const submitBtn = document.getElementById('formSubmitBtn');
+
+        if (item) {
+            titleEl.textContent = '编辑内容';
+            idInput.value = item.id;
+            titleInput.value = item.title || '';
+            contentInput.value = item.content || '';
+            imageInput.value = item.image || '';
+            categorySelect.value = item.category || '其他';
+            dateInput.value = item.date || '';
+            submitBtn.textContent = '更新';
+            editingId = item.id;
+        } else {
+            titleEl.textContent = '新增内容';
+            idInput.value = '';
+            titleInput.value = '';
+            contentInput.value = '';
+            imageInput.value = '';
+            categorySelect.value = '日常';
+            dateInput.value = todayStr();
+            submitBtn.textContent = '添加';
+            editingId = null;
+        }
+        overlay.classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('modalOverlay').classList.remove('active');
+        editingId = null;
+    }
+
+    // 初始化
+    async function init() {
+        const cfg = getConfig();
+        if (cfg.token && cfg.repo) {
+            try {
+                const result = await fetchGitHubData(cfg);
+                if (result) {
+                    data = result.data;
+                    setLocalData(data);
+                    toast('✅ 已从 GitHub 同步数据', 'success');
+                } else {
+                    data = getLocalData();
+                }
+            } catch (e) {
+                console.warn('GitHub 加载失败，使用本地数据:', e);
+                data = getLocalData();
+                toast('⚠️ GitHub 同步失败，使用本地数据', 'error');
+            }
+        } else {
+            data = getLocalData();
+        }
+        if (!Array.isArray(data)) data = [];
+        refreshAll();
+
+        // 视图切换
+        const navHome = document.getElementById('navHome');
+        const navAdmin = document.getElementById('navAdmin');
+        const viewHome = document.getElementById('viewHome');
+        const viewAdmin = document.getElementById('viewAdmin');
+
+        function switchView(view) {
+            if (view === 'home') {
+                viewHome.classList.remove('hidden');
+                viewAdmin.classList.add('hidden');
+                navHome.classList.add('active');
+                navAdmin.classList.remove('active');
+                renderHome();
+            } else {
+                viewHome.classList.add('hidden');
+                viewAdmin.classList.remove('hidden');
+                navAdmin.classList.add('active');
+                navHome.classList.remove('active');
+                renderAdmin();
+            }
+        }
+
+        navHome.addEventListener('click', () => switchView('home'));
+        navAdmin.addEventListener('click', () => switchView('admin'));
+        document.getElementById('goAdminBtn').addEventListener('click', () => switchView('admin'));
+
+        // 模态框（新增/编辑）事件
+        document.getElementById('addItemBtn').addEventListener('click', () => openModal(null));
+        document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+        document.getElementById('formCancelBtn').addEventListener('click', closeModal);
+        document.getElementById('modalOverlay').addEventListener('click', (e) => { if (e.target === e.currentTarget) closeModal(); });
+
+        document.getElementById('itemForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const title = document.getElementById('formTitle').value.trim();
+            if (!title) { toast('请输入标题', 'error'); return; }
+            const id = document.getElementById('formId').value;
+            const content = document.getElementById('formContent').value.trim();
+            const image = document.getElementById('formImage').value.trim();
+            const category = document.getElementById('formCategory').value;
+            const date = document.getElementById('formDate').value;
+
+            if (id) {
+                const idx = data.findIndex(d => d.id === id);
+                if (idx !== -1) {
+                    data[idx] = { ...data[idx], title, content, image, category, date: date || data[idx].date };
+                    saveAndRefresh('✅ 已更新');
+                }
+            } else {
+                const newItem = { id: uuid(), title, content: content || '', image: image || '', category, date: date || todayStr() };
+                data.unshift(newItem);
+                saveAndRefresh('✅ 已添加');
+            }
+            closeModal();
+        });
+
+        // 导出
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `jinying_data_${todayStr()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            toast('📥 已导出 JSON', 'info');
+        });
+
+        // 导入
+        document.getElementById('importBtn').addEventListener('click', () => {
+            document.getElementById('importFileInput').click();
+        });
+        document.getElementById('importFileInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    const imported = JSON.parse(ev.target.result);
+                    if (!Array.isArray(imported)) throw new Error('格式错误');
+                    imported.forEach(item => { if (!item.id) item.id = uuid(); });
+                    data = imported;
+                    setLocalData(data);
+                    refreshAll();
+                    toast('✅ 导入成功', 'success');
+                } catch (err) { toast('❌ 导入失败: ' + err.message, 'error'); }
+            };
+            reader.readAsText(file);
+            e.target.value = '';
+        });
+
+        // 配置面板
+        const configToggle = document.getElementById('configToggle');
+        const configBody = document.getElementById('configBody');
+        const configChevron = document.getElementById('configChevron');
+        configToggle.addEventListener('click', () => {
+            configBody.classList.toggle('open');
+            configChevron.classList.toggle('open');
+        });
+
+        document.getElementById('cfgToken').value = cfg.token || '';
+        document.getElementById('cfgRepo').value = cfg.repo || '';
+        document.getElementById('cfgPath').value = cfg.path || 'data/data.json';
+        document.getElementById('cfgBranch').value = cfg.branch || 'main';
+
+        document.getElementById('cfgSaveBtn').addEventListener('click', () => {
+            const newCfg = {
+                token: document.getElementById('cfgToken').value.trim(),
+                repo: document.getElementById('cfgRepo').value.trim(),
+                path: document.getElementById('cfgPath').value.trim() || 'data/data.json',
+                branch: document.getElementById('cfgBranch').value.trim() || 'main',
+            };
+            saveConfig(newCfg);
+            toast('✅ 配置已保存', 'success');
+        });
+
+        // 保存到 GitHub
+        document.getElementById('saveToGitHubBtn').addEventListener('click', async () => {
+            const cfg = getConfig();
+            if (!cfg.token || !cfg.repo) { toast('❌ 请先配置 GitHub Token 和仓库', 'error'); return; }
+            const status = document.getElementById('saveStatus');
+            status.textContent = '⏳ 正在保存到 GitHub...';
+            status.className = 'save-status';
+            try {
+                let sha = null;
+                try { const exist = await fetchGitHubData(cfg); if (exist) sha = exist.sha; } catch { /* 忽略 */ }
+                await pushGitHubData(cfg, data, sha);
+                status.textContent = '✅ 已同步到 GitHub';
+                status.className = 'save-status success';
+                toast('✅ 数据已保存到 GitHub', 'success');
+            } catch (e) {
+                status.textContent = '❌ 同步失败: ' + e.message;
+                status.className = 'save-status error';
+                toast('❌ GitHub 同步失败: ' + e.message, 'error');
+            }
+        });
+
+        // 重置本地数据
+        document.getElementById('resetLocalBtn').addEventListener('click', () => {
+            if (confirm('确定要重置所有本地数据吗？此操作不可撤销！')) {
+                data = [];
+                setLocalData(data);
+                refreshAll();
+                toast('已重置本地数据', 'info');
+            }
+        });
+
+        // 大图详情模态框关闭事件
+        document.getElementById('detailCloseBtn').addEventListener('click', closeDetail);
+        document.getElementById('detailOverlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeDetail();
+        });
+
+        // 键盘关闭
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeDetail();
+            }
+        });
+    }
+
+    // 启动
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+
+})();
+</script>
+</body>
+</html>
